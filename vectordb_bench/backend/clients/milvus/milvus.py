@@ -118,8 +118,8 @@ class Milvus(VectorDB):
 
             wait_index()
 
-            # Skip compaction if using GPU indexType
-            if self.case_config.index in [IndexType.GPU_CAGRA, IndexType.GPU_IVF_FLAT, IndexType.GPU_IVF_PQ]:
+            # Skip compaction if use GPU indexType
+            if self.case_config.is_gpu_index:
                 log.debug("skip compaction for gpu index type.")
             else :
                 try:
@@ -164,6 +164,10 @@ class Milvus(VectorDB):
 
     def need_normalize_cosine(self) -> bool:
         """Wheather this database need to normalize dataset to support COSINE"""
+        if self.case_config.is_gpu_index:
+            log.info(f"current gpu_index only supports IP / L2, cosine dataset need normalize.")
+            return True
+
         return False
 
     def insert_embeddings(
